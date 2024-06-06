@@ -1,6 +1,7 @@
 import service from "./service.js";
+import createError from "http-errors";
 import { STATUSCODE } from "../../../constants/index.js";
-import { responseHandler } from "../../../utils/index.js";
+import { responseHandler, multipleImages } from "../../../utils/index.js";
 
 const getAllTests = async (req, reply) => {
   const data = await service.getAll();
@@ -8,10 +9,10 @@ const getAllTests = async (req, reply) => {
   responseHandler(
     req,
     reply,
+    data,
     data?.length === STATUSCODE.ZERO
       ? "No Tests found"
       : "All Tests retrieved successfully",
-    data
   );
 };
 
@@ -21,10 +22,10 @@ const getAllTestsDeleted = async (req, reply) => {
   responseHandler(
     req,
     reply,
+    data,
     data?.length === STATUSCODE.ZERO
       ? "No Deleted Tests found"
       : "All Deleted Tests retrieved successfully",
-    data
   );
 };
 
@@ -34,21 +35,39 @@ const getSingleTest = async (req, reply) => {
   responseHandler(
     req,
     reply,
+    data,
     !data ? "No Test found" : "Test retrieved successfully",
-    data
   );
 };
 
 const createNewTest = async (req, reply) => {
-  const data = await service.add(req.body);
+  const uploadedImages = await multipleImages(req.files, []);
 
-  responseHandler(req, reply, "Test created successfully", [data]);
+  if (uploadedImages.length === STATUSCODE.ZERO)
+    throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
+
+  const data = await service.add({
+    ...req.body,
+    image: uploadedImages,
+  });
+
+  responseHandler(req, reply, [data], "Test created successfully");
 };
 
 const updateTest = async (req, reply) => {
-  const data = await service.update(req.params.id, req.body);
+  const oldData = await service.getById(req.params.id);
 
-  responseHandler(req, reply, "Test updated successfully", [data]);
+  const uploadNewImages = await multipleImages(
+    req.files,
+    oldData?.image.map((image) => image.public_id) || [],
+  );
+
+  const data = await service.update(req.params.id, {
+    ...req.body,
+    image: uploadNewImages,
+  });
+
+  responseHandler(req, reply, [data], "Test updated successfully");
 };
 
 const deleteTest = async (req, reply) => {
@@ -58,7 +77,7 @@ const deleteTest = async (req, reply) => {
     ? "Test is already deleted"
     : "Test deleted successfully";
 
-  responseHandler(req, reply, message, data?.deleted ? [] : [data]);
+  responseHandler(req, reply, data?.deleted ? [] : [data], message);
 };
 
 const restoreTest = async (req, reply) => {
@@ -68,7 +87,7 @@ const restoreTest = async (req, reply) => {
     ? "Test is not deleted"
     : "Test restored successfully";
 
-  responseHandler(req, reply, message, !data?.deleted ? [] : [data]);
+  responseHandler(req, reply, !data?.deleted ? [] : [data], message);
 };
 
 const forceDeleteTest = async (req, reply) => {
@@ -76,7 +95,12 @@ const forceDeleteTest = async (req, reply) => {
 
   const message = !data ? "No Test found" : "Test force deleted successfully";
 
-  responseHandler(req, reply, message, data);
+  await multipleImages(
+    [],
+    data?.image ? data.image.map((image) => image.public_id) : [],
+  );
+
+  responseHandler(req, reply, data, message);
 };
 
 export {

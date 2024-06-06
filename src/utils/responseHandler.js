@@ -1,4 +1,4 @@
-export function responseHandler(app, reply, message, data, meta = {}) {
+export function responseHandler(app, reply, data, message, meta = {}) {
   const response = {
     status: !!data,
     data: data || [],

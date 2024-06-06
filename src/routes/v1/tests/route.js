@@ -1,5 +1,6 @@
 import * as testController from "./controller.js";
 import { METHOD, PATH } from "../../../constants/index.js";
+import { upload } from "../../../utils/index.js";
 
 const routes = [
   {
@@ -19,11 +20,13 @@ const routes = [
   {
     method: METHOD.POST,
     handler: testController.createNewTest,
+    preHandler: upload.array("image"),
   },
   {
     method: METHOD.PATCH,
     path: PATH.EDIT,
     handler: testController.updateTest,
+    preHandler: upload.array("image"),
   },
   {
     method: METHOD.DELETE,
@@ -43,8 +46,10 @@ const routes = [
 ];
 
 const router = (app, opts, done) => {
-  routes.forEach(({ method, path = "", handler }) => {
-    app.route({ method, url: path, handler });
+  routes.forEach(({ method, path = "", handler, preHandler }) => {
+    const routeOptions = { method, url: path, handler, preHandler: [] };
+    if (preHandler) routeOptions.preHandler = preHandler;
+    app.route(routeOptions);
   });
   done();
 };

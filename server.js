@@ -1,11 +1,13 @@
 import { fastify } from "fastify";
 import { connectDB, ENV } from "./src/config/index.js";
 import { addRoutes } from "./src/routes/index.js";
+import { addErrorHandler } from "./src/utils/index.js";
 
 const app = fastify({ logger: true });
 
 function run() {
   addRoutes(app);
+  addErrorHandler(app);
 
   connectDB(ENV.DATABASE_URI);
   app.log.info(`Host Database connected to ${ENV.DATABASE_URI}`);
