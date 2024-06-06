@@ -12,6 +12,11 @@ const schemaOptions = {
 
 const schema = new Schema(
   {
+    test: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: RESOURCE.TESTS,
+    },
     message: {
       type: String,
       required: true,
@@ -37,4 +42,4 @@ const schema = new Schema(
   schemaOptions,
 );
 
-export default model(RESOURCE.TESTS, schema);
+export default model(RESOURCE.TESTS_CHILD, schema);

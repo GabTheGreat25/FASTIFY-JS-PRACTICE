@@ -3,7 +3,7 @@ import createError from "http-errors";
 import { STATUSCODE } from "../../../constants/index.js";
 import { responseHandler, multipleImages } from "../../../utils/index.js";
 
-const getAllTests = async (req, reply) => {
+const getAllTestsChild = async (req, reply) => {
   const data = await service.getAll();
 
   responseHandler(
@@ -11,12 +11,12 @@ const getAllTests = async (req, reply) => {
     reply,
     data,
     data?.length === STATUSCODE.ZERO
-      ? "No Tests found"
-      : "All Tests retrieved successfully",
+      ? "No Tests Child found"
+      : "All Tests Child retrieved successfully",
   );
 };
 
-const getAllTestsDeleted = async (req, reply) => {
+const getAllTestsChildDeleted = async (req, reply) => {
   const data = await service.getAllDeleted();
 
   responseHandler(
@@ -24,23 +24,23 @@ const getAllTestsDeleted = async (req, reply) => {
     reply,
     data,
     data?.length === STATUSCODE.ZERO
-      ? "No Deleted Tests found"
-      : "All Deleted Tests retrieved successfully",
+      ? "No Deleted Tests Child found"
+      : "All Deleted Tests Child retrieved successfully",
   );
 };
 
-const getSingleTest = async (req, reply) => {
+const getSingleTestChild = async (req, reply) => {
   const data = await service.getById(req.params.id);
 
   responseHandler(
     req,
     reply,
     data,
-    !data ? "No Test found" : "Test retrieved successfully",
+    !data ? "No Test Child found" : "Test Child retrieved successfully",
   );
 };
 
-const createNewTest = async (req, reply) => {
+const createNewTestChild = async (req, reply) => {
   const uploadedImages = await multipleImages(req.files, []);
 
   if (uploadedImages.length === STATUSCODE.ZERO)
@@ -51,11 +51,11 @@ const createNewTest = async (req, reply) => {
     image: uploadedImages,
   });
 
-  responseHandler(req, reply, [data], "Test created successfully");
+  responseHandler(req, reply, [data], "Test Child created successfully");
 };
 
-const updateTest = async (req, reply) => {
-  const oldData = await service.getById(req.params.id);
+const updateTestChild = async (req, reply) => {
+  const oldData = await service.getImageById(req.params.id);
 
   const uploadNewImages = await multipleImages(
     req.files,
@@ -67,35 +67,41 @@ const updateTest = async (req, reply) => {
     image: uploadNewImages,
   });
 
-  responseHandler(req, reply, [data], "Test updated successfully");
+  responseHandler(req, reply, [data], "Test Child updated successfully");
 };
 
-const deleteTest = async (req, reply) => {
+const deleteTestChild = async (req, reply) => {
   const data = await service.deleteById(req.params.id);
 
   responseHandler(
     req,
     reply,
     data?.deleted ? [] : [data],
-    data?.deleted ? "Test is already deleted" : "Test deleted successfully",
+    data?.deleted
+      ? "Test Child is already deleted"
+      : "Test Child deleted successfully",
   );
 };
 
-const restoreTest = async (req, reply) => {
+const restoreTestChild = async (req, reply) => {
   const data = await service.restoreById(req.params.id);
 
   responseHandler(
     req,
     reply,
     !data?.deleted ? [] : data,
-    !data?.deleted ? "Test is not deleted" : "Test restored successfully",
+    !data?.deleted
+      ? "Test child is not deleted"
+      : "Test child restored successfully",
   );
 };
 
-const forceDeleteTest = async (req, reply) => {
+const forceDeleteTestChild = async (req, reply) => {
   const data = await service.forceDelete(req.params.id);
 
-  const message = !data ? "No Test found" : "Test force deleted successfully";
+  const message = !data
+    ? "No Test Child found"
+    : "Test Child force deleted successfully";
 
   await multipleImages(
     [],
@@ -106,12 +112,12 @@ const forceDeleteTest = async (req, reply) => {
 };
 
 export {
-  getAllTests,
-  getAllTestsDeleted,
-  getSingleTest,
-  createNewTest,
-  updateTest,
-  deleteTest,
-  restoreTest,
-  forceDeleteTest,
+  getAllTestsChild,
+  getAllTestsChildDeleted,
+  getSingleTestChild,
+  createNewTestChild,
+  updateTestChild,
+  deleteTestChild,
+  restoreTestChild,
+  forceDeleteTestChild,
 };

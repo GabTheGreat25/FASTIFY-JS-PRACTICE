@@ -5,8 +5,8 @@ import { RESOURCE } from "../constants/index.js";
 export const routes = [...V1];
 
 export const addRoutes = (app) => {
+  app.register(fastifyMultipart);
   routes.forEach((route) => {
-    app.register(fastifyMultipart);
     app.register(route.route, { prefix: `${RESOURCE.API}${route.url}` });
   });
 };
