@@ -1,11 +1,13 @@
 import { fastify } from "fastify";
-import { connectDB, ENV } from "./src/config/index.js";
+import { addMiddlewares } from "./src/middlewares/index.js";
 import { addRoutes } from "./src/routes/index.js";
 import { addErrorHandler } from "./src/utils/index.js";
+import { connectDB, ENV } from "./src/config/index.js";
 
 const app = fastify({ logger: true });
 
 function run() {
+  addMiddlewares(app);
   addRoutes(app);
   addErrorHandler(app);
 

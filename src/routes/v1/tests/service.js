@@ -9,15 +9,15 @@ async function getAllDeleted() {
   return await model.find({ deleted: true });
 }
 
-async function getById(id) {
-  return await model.findOne({ _id: id, deleted: false });
+async function getById(_id) {
+  return await model.findOne({ _id, deleted: false });
 }
 
-async function add(data) {
-  return await model.create(data);
+async function add(body) {
+  return await model.create(body);
 }
 
-async function update(id, data) {
+async function update(_id, body) {
   return await model.findByIdAndUpdate(_id, body, {
     new: true,
     runValidators: true,

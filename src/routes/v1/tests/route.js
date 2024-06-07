@@ -47,8 +47,12 @@ const routes = [
 
 const router = (app, opts, done) => {
   routes.forEach(({ method, path = "", handler, preHandler }) => {
-    const routeOptions = { method, url: path, handler, preHandler: [] };
-    if (preHandler) routeOptions.preHandler = preHandler;
+    const routeOptions = {
+      method,
+      url: path,
+      handler,
+      preHandler: preHandler || [],
+    };
     app.route(routeOptions);
   });
   done();
